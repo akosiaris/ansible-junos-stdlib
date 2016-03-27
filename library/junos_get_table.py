@@ -40,6 +40,11 @@ options:
             - Login password
         required: false
         default: assumes ssh-key active
+    ssh_private_key_file:
+        description:
+            - SSH private key file
+        required: false
+        default: autodiscovered ssh key
     logfile:
         description:
             - Path on the local server where the progress status is logged
@@ -167,6 +172,7 @@ def main():
                            user=dict(required=False,
                                      default=os.getenv('USER')),
                            passwd=dict(required=False, default=None),
+                           ssh_private_key_file=dict(required=False, default=None),
                            port=dict(required=False, default=830),
                            logfile=dict(required=False, default=None),
                            file=dict(required=True, default=None),
@@ -198,6 +204,7 @@ def main():
                                                           args['port']))
     try:
         dev = Device(args['host'], user=args['user'], password=args['passwd'],
+                     ssh_private_key_file=args['ssh_private_key_file'],
                      port=args['port'], gather_facts=False).open()
     except Exception as err:
         msg = 'unable to connect to {0}: {1}'.format(args['host'], str(err))

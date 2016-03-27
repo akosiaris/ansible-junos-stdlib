@@ -62,6 +62,11 @@ options:
             - Login password
         required: false
         default: assumes ssh-key active
+    ssh_private_key_file:
+        description:
+            - SSH private key file
+        required: false
+        default: autodiscovered ssh key
     console:
         description:
             - CONSOLE port, per the B(netconify) utility
@@ -124,6 +129,7 @@ def main():
             savedir=dict(required=False, default=None),
             user=dict(required=False, default=os.getenv('USER')),
             passwd=dict(required=False, default=None),
+            ssh_private_key_file=dict(required=False, default=None),
             port=dict(required=False, default=830)),
         supports_check_mode=True)
 
@@ -141,7 +147,9 @@ def main():
         # -----------
         # via NETCONF
         # -----------
-        dev = Device(m_args['host'], user=m_args['user'], passwd=m_args['passwd'], port=m_args['port'])
+        dev = Device(m_args['host'], user=m_args['user'], passwd=m_args['passwd'],
+                     ssh_private_key_file=m_args['ssh_private_key_file'],
+                     port=m_args['port'])
         try:
             dev.open()
         except Exception as err:

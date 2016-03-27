@@ -73,6 +73,11 @@ options:
             - Login password
         required: false
         default: assumes ssh-key active
+    ssh_private_key_file:
+        description:
+            - SSH private key file
+        required: false
+        default: autodiscovered ssh key
     cluster_enable:
         description:
             - yes/true - set device to cluster mode (specify cluster_id and node)
@@ -127,6 +132,7 @@ def main():
             host=dict(required=True, default=None),       # host or ipaddr
             user=dict(required=False, default=os.getenv('USER')),
             passwd=dict(required=False, default=None),
+            ssh_private_key_file=dict(required=False, default=None),
             port=dict(required=False, default=830),
             console=dict(required=False, default=None),     # param to netconify
             cluster_enable=dict(required=True, type='bool', choices=BOOLEANS, default=None),
@@ -165,7 +171,9 @@ def main():
         except ImportError:
             module.fail_json(msg='junos-eznc >= 1.2.2 is required for this module')
 
-        dev = Device(args['host'], user=args['user'], password=args['passwd'], port=args['port'], gather_facts=('false'))
+        dev = Device(args['host'], user=args['user'], password=args['passwd'],
+                     ssh_private_key_file=args['ssh_private_key_file'],
+                     port=args['port'], gather_facts=('false'))
         try:
             logging.info('LOGIN: host={0} port={1}'.format(args['host'], args['port']))
             dev.open()

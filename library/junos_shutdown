@@ -60,6 +60,11 @@ options:
             - Login password
         required: false
         default: assumes ssh-key active
+    ssh_private_key_file:
+        description:
+            - SSH private key file
+        required: false
+        default: autodiscovered ssh key
     reboot:
         description:
             - If set to B(yes), then the device is rebooted rather than powered off.
@@ -106,6 +111,7 @@ def main():
             host=dict(required=True, default=None),       # host or ipaddr
             user=dict(required=False, default=os.getenv('USER')),
             passwd=dict(required=False, default=None),
+            ssh_private_key_file=dict(required=False, default=None),
             reboot=dict(required=False, type='bool', choices=BOOLEANS, default=False),
             port=dict(required=False, default=830)
         ),
@@ -121,7 +127,9 @@ def main():
     restart_mode = module.boolean(args['reboot'])
 
     try:
-        dev = Device(args['host'], user=args['user'], password=args['passwd'], port=args['port']).open()
+        dev = Device(args['host'], user=args['user'], password=args['passwd'],
+                     ssh_private_key_file=args['ssh_private_key_file'],
+                     port=args['port']).open()
     except Exception as err:
         msg = 'unable to connect to {0}: {1}'.format(args['host'], str(err))
         module.fail_json(msg=msg)
